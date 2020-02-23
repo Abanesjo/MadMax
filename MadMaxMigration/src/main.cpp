@@ -688,7 +688,7 @@ void timeFunction(void(*f)()) { // this function is untested
 void autonomous(void) {
   // ..........................................................................
   // Insert autonomous user code here.
-  timeFunction(&bluFive);
+  timeFunction(&blueBoi);
   // ..........................................................................
 }
 
@@ -703,21 +703,21 @@ void autonomous(void) {
 /*---------------------------------------------------------------------------*/
 
 void usercontrol(void) {
-  // accelerate(0,20,100);
-  // Controller1.ButtonY.pressed(controlMode);
-  // Controller1.ButtonRight.pressed(intakeMode);
-  // while (1) {
-  //   arm();
-  //   tank();
+  accelerate(0,20,100);
+  Controller1.ButtonY.pressed(controlMode);
+  Controller1.ButtonRight.pressed(intakeMode);
+  while (1) {
+    arm();
+    tank();
 
-  //   // wait(20, msec); // Sleep the task for a short amount of time to
-  //                   // prevent wasted resources.
-  // }
-  auto start = high_resolution_clock::now();
-  blueBoi();
-  auto stopp = high_resolution_clock::now();
-  auto duration = duration_cast<milliseconds>(stopp - start);
-  std::cout << "Time taken by function: " << duration.count() << " milliseconds" << std::endl;
+    // wait(20, msec); // Sleep the task for a short amount of time to
+                    // prevent wasted resources.
+  }
+//   auto start = high_resolution_clock::now();
+//   blueBoi();
+//   auto stopp = high_resolution_clock::now();
+//   auto duration = duration_cast<milliseconds>(stopp - start);
+//   std::cout << "Time taken by function: " << duration.count() << " milliseconds" << std::endl;
 }
 
 //
