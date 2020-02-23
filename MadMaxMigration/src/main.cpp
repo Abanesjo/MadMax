@@ -703,7 +703,6 @@ void autonomous(void) {
 /*---------------------------------------------------------------------------*/
 
 void usercontrol(void) {
-  accelerate(0,20,100);
   Controller1.ButtonY.pressed(controlMode);
   Controller1.ButtonRight.pressed(intakeMode);
   while (1) {
