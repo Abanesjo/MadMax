@@ -40,6 +40,11 @@ bool autoIntake = false;
 bool manual = false;
 int countr = 0;
 int rampState = 0;
+int mmax = 3;
+int motors[2][3] = {
+  {0,0,0},
+  {0,0,0}
+};
 
 void controlMode() {
   manual = !manual;
@@ -169,7 +174,7 @@ void userAcceleration(void){
   }
   Brain.Screen.printAt(100,50,"right: %0.2ld",velocities[1]);
   Brain.Screen.printAt(100,25,"left: %0.2ld",velocities[0]);
-  velocityset(velocities[0], velocities[1]); 
+  velocitySet(velocities[0], velocities[1]); 
   LeftFront.spin(vex::directionType::fwd);
   RightFront.spin(vex::directionType::fwd);
   LeftBack.spin(vex::directionType::fwd);
