@@ -150,7 +150,7 @@ void tank() {
   RightBack.spin(directionType::fwd, Controller1.Axis2.position()*0.75, percentUnits::pct);
 }
 
-void testDrive(void){
+void userAcceleration(void){
   LeftFront.spin(directionType::fwd);
   RightFront.spin(directionType::fwd);
   int velocities[2] = {0,0};
@@ -735,8 +735,8 @@ void usercontrol(void) {
   Controller1.ButtonRight.pressed(intakeMode);
   while (1) {
     arm();
-    tank();
-
+    //tank();
+    userAcceleration();
     // wait(20, msec); // Sleep the task for a short amount of time to
                     // prevent wasted resources.
   }
