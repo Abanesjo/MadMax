@@ -149,6 +149,34 @@ void tank() {
   RightFront.spin(directionType::fwd, Controller1.Axis2.position()*0.75, percentUnits::pct);
   RightBack.spin(directionType::fwd, Controller1.Axis2.position()*0.75, percentUnits::pct);
 }
+
+void testDrive(void){
+  LeftFront.spin(directionType::fwd);
+  RightFront.spin(directionType::fwd);
+  int velocities[2] = {0,0};
+
+  motors[0][0]=controller1.Axis3.position(); // left
+  motors[1][0]=controller1.Axis2.position(); // right
+  
+  for(int m=0; m<2; m++){
+    int mymot = motors[m][mmax-1];
+    for(int i=mmax-2; i>=0; i--){
+      mymot += motors[m][i];
+      motors[m][i+1] = motors[m][i];
+    }
+    mymot /= (mmax+1);
+    velocities[m] = mymot;
+  }
+  Brain.Screen.printAt(100,50,"right: %0.2ld",velocities[1]);
+  Brain.Screen.printAt(100,25,"left: %0.2ld",velocities[0]);
+  velocityset(velocities[0], velocities[1]); 
+  LeftFront.spin(vex::directionType::fwd);
+  RightFront.spin(vex::directionType::fwd);
+  LeftBack.spin(vex::directionType::fwd);
+  RightBack.spin(vex::directionType::fwd);
+  vex::task::sleep(5);
+}
+
 void arm() {
  ramp.setBrake(brakeType::hold);
  armLift.setBrake(brakeType::hold);
