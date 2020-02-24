@@ -160,8 +160,8 @@ void userAcceleration(void){
   RightFront.spin(directionType::fwd);
   int velocities[2] = {0,0};
 
-  motors[0][0]=controller1.Axis3.position(); // left
-  motors[1][0]=controller1.Axis2.position(); // right
+  motors[0][0]=Controller1.Axis3.position(); // left
+  motors[1][0]=Controller1.Axis2.position(); // right
   
   for(int m=0; m<2; m++){
     int mymot = motors[m][mmax-1];
