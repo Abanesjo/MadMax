@@ -145,10 +145,10 @@ void accelerate(double u_percent,double v_percent, double x_cm) {
 
 #pragma region actions
 void tank() {
-  LeftFront.setBrake(brakeType::coast);
-  RightFront.setBrake(brakeType::coast);
-  LeftBack.setBrake(brakeType::coast);
-  RightBack.setBrake(brakeType::coast);
+  //LeftFront.setBrake(brakeType::coast);
+  //RightFront.setBrake(brakeType::coast);
+  //LeftBack.setBrake(brakeType::coast);
+  //RightBack.setBrake(brakeType::coast);
   LeftFront.spin(directionType::fwd, Controller1.Axis3.position()*0.75, percentUnits::pct);
   LeftBack.spin(directionType::fwd, Controller1.Axis3.position()*0.75, percentUnits::pct);
   RightFront.spin(directionType::fwd, Controller1.Axis2.position()*0.75, percentUnits::pct);
@@ -156,29 +156,26 @@ void tank() {
 }
 
 void userAcceleration(void){
-  LeftFront.spin(directionType::fwd);
-  RightFront.spin(directionType::fwd);
   int velocities[2] = {0,0};
-
-  motors[0][0]=Controller1.Axis3.position(); // left
-  motors[1][0]=Controller1.Axis2.position(); // right
+  motors[0][0]=Controller1.Axis3.position(); // assigning the left motors
+  motors[1][0]=Controller1.Axis2.position(); // assigning the right motors
   
   for(int m=0; m<2; m++){
     int mymot = motors[m][mmax-1];
     for(int i=mmax-2; i>=0; i--){
-      mymot += motors[m][i];
-      motors[m][i+1] = motors[m][i];
+      mymot += motors[m][i]; //totaling 3 most recent axis positions
+      motors[m][i+1] = motors[m][i]; //moving up axis position values
     }
-    mymot /= (mmax+1);
+    mymot /= (mmax+1); 
     velocities[m] = mymot;
+    //averaging 3 most recent axis positions for left/right motors
   }
-  Brain.Screen.printAt(100,50,"right: %0.2ld",velocities[1]);
-  Brain.Screen.printAt(100,25,"left: %0.2ld",velocities[0]);
   velocitySet(velocities[0], velocities[1]); 
   LeftFront.spin(vex::directionType::fwd);
   RightFront.spin(vex::directionType::fwd);
   LeftBack.spin(vex::directionType::fwd);
   RightBack.spin(vex::directionType::fwd);
+
   vex::task::sleep(5);
 }
 
@@ -213,7 +210,7 @@ void arm() {
     Controller1.Screen.clearScreen();
     Controller1.Screen.print("Automatic Mode");
     if(Controller1.ButtonUp.pressing()) {
-      ramp.rotateTo(1210,rotationUnits::deg,false); //perpendicular position(stacking)
+      ramp.rotateTo(1200,rotationUnits::deg,false); //perpendicular position(stacking)
     } else if(Controller1.ButtonDown.pressing()) {
       ramp.rotateTo(10,rotationUnits::deg,false); //declined position(intake / rest)
     } else {
@@ -231,7 +228,7 @@ void arm() {
     }
     //Controls the raising of the arm
     if(Controller1.ButtonX.pressing()) {
-      armLift.rotateTo(1080,rotationUnits::deg,false); //middle-height tower
+      armLift.rotateTo(1034,rotationUnits::deg,false); //middle-height tower
     } else if(Controller1.ButtonA.pressing()) {
       armLift.rotateTo(780,rotationUnits::deg,false); //lowest tower
     } else if(Controller1.ButtonB.pressing()) {
@@ -629,15 +626,15 @@ void bluFive() {
   //implemented as here the robot doesn’t start from a base.
   
   //-------------Expansion-------------
-  armLeft.setVelocity(100,percentUnits::pct);
-  armRight.setVelocity(100,percentUnits::pct);
-  armLeft.spin(directionType::rev);
-  armRight.spin(directionType::rev);
-  task::sleep(300);
-  armLeft.spin(directionType::fwd);
-  armRight.spin(directionType::fwd);
-  forwardTime(300,-40);
-  task::sleep(150);
+  // armLeft.setVelocity(100,percentUnits::pct);
+  // armRight.setVelocity(100,percentUnits::pct);
+  // armLeft.spin(directionType::rev);
+  // armRight.spin(directionType::rev);
+  // task::sleep(350);
+  // armLeft.spin(directionType::fwd);
+  // armRight.spin(directionType::fwd);
+  // forwardTime(350,-40);
+  // task::sleep(150);
   //--------End of Expansion------------
 
   armLeft.setVelocity(100,percentUnits::pct);
@@ -646,17 +643,17 @@ void bluFive() {
   armRight.spin(directionType::fwd);
   forwardDistance(110,30);
   task::sleep(500);
-  armLeft.rotateFor(-170,rotationUnits::deg,false);
-  armRight.rotateFor(-170,rotationUnits::deg,false);
+  armLeft.rotateFor(-75,rotationUnits::deg,false);
+  armRight.rotateFor(-75,rotationUnits::deg,false);
 
-  forwardDistance(-35,30);
+  forwardDistance(-20,30);
   task::sleep(300);
-  turn(1,400,20); //389
+  turn(1,410,20); //389
   task::sleep(300);
 
   forwardTime(1000,60);
   task::sleep(200);
-  forwardTime(550,-10);
+  //forwardTime(550,-10);
 
   ramp.setVelocity(45,percentUnits::pct);
   ramp.rotateTo(1300,rotationUnits::deg);
@@ -721,7 +718,12 @@ void timeFunction(void(*f)()) { // this function is untested
 void autonomous(void) {
   // ..........................................................................
   // Insert autonomous user code here.
-  timeFunction(&blueBoi);
+  auto start = high_resolution_clock::now();
+  bluFive();
+  auto stopp = high_resolution_clock::now();
+  auto duration = duration_cast<milliseconds>(stopp - start);
+  std::cout << "Time taken by function: " << duration.count() << " milliseconds" << std::endl;
+  // timeFunction(&blueBoi);
   // ..........................................................................
 }
 
@@ -740,16 +742,16 @@ void usercontrol(void) {
   Controller1.ButtonRight.pressed(intakeMode);
   while (1) {
     arm();
-    //tank();
-    userAcceleration();
-    // wait(20, msec); // Sleep the task for a short amount of time to
+    tank();
+    //userAcceleration();
+    wait(10, msec); // Sleep the task for a short amount of time to
                     // prevent wasted resources.
   }
-//   auto start = high_resolution_clock::now();
-//   blueBoi();
-//   auto stopp = high_resolution_clock::now();
-//   auto duration = duration_cast<milliseconds>(stopp - start);
-//   std::cout << "Time taken by function: " << duration.count() << " milliseconds" << std::endl;
+  // auto start = high_resolution_clock::now();
+  // bluFive();
+  // auto stopp = high_resolution_clock::now();
+  // auto duration = duration_cast<milliseconds>(stopp - start);
+  // std::cout << "Time taken by function: " << duration.count() << " milliseconds" << std::endl;
 }
 
 //
