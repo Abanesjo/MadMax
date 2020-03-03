@@ -13,8 +13,8 @@ motor RightFront = motor(PORT19, ratio18_1, true);
 motor LeftBack = motor(PORT13, ratio18_1, false);
 motor RightBack = motor(PORT20, ratio18_1, true);
 motor armLift = motor(PORT1, ratio18_1, false);
-motor armLeft = motor(PORT4, ratio18_1, true);
-motor armRight = motor(PORT6, ratio18_1, false);
+motor armLeft = motor(PORT4, ratio18_1, false);
+motor armRight = motor(PORT6, ratio18_1, true);
 motor ramp = motor(PORT2, ratio18_1, false);
 controller Controller1 = controller(primary);
 
