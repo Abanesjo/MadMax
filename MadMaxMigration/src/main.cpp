@@ -77,11 +77,18 @@ double tocm(double deg) {//not used yet
   double cm = deg * circumference /360;
   return cm;
 }
+
 void move(directionType type) { //not used
   LeftFront.spin(type);
   RightFront.spin(type);
   LeftBack.spin(type);
   RightBack.spin(type);
+}
+void stopp() {
+  LeftFront.stop();
+  RightFront.stop();
+  LeftBack.stop();
+  RightBack.stop();
 }
 void forwardDistance(double cm, double vel) {
   velocitySet(vel, vel);
@@ -135,33 +142,54 @@ void accelerate(double u_percent,double v_percent, double x_cm) {
     wait(deltaT,timeUnits::msec);
     vel += (deltaT/1000)*((v*v)- (u*u)) / (2*x);
   }
-  LeftFront.stop();
-  RightFront.stop();
-  LeftBack.stop();
-  RightBack.stop();
+  velocitySet(0,0);
+}
+void decelerate(double u_percent,double v_percent, double x_cm) {
+  double u = (u_percent/100) * 1200;
+  double v = (v_percent/100) * 1200;
+  double x = (x_cm /100)*(180/(M_PI*0.0508)); // decrease or change wheel radius
+  double deltaT = 5;
+  double vel = u;
+  while(vel > v) {
+    Brain.Screen.clearScreen();
+    Brain.Screen.printAt(10,14,"%0.2f",vel);
+
+    LeftFront.spin(directionType::fwd,vel,velocityUnits::dps);
+    RightFront.spin(directionType::fwd,vel,velocityUnits::dps);
+    LeftBack.spin(directionType::fwd,vel,velocityUnits::dps);
+    RightBack.spin(directionType::fwd,vel,velocityUnits::dps);
+
+    wait(deltaT,timeUnits::msec);
+    vel += (deltaT/1000)*((v*v)- (u*u)) / (2*x);
+  }
+  velocitySet(0,0);
 }
 
 #pragma endregion
 
 #pragma region actions
 void tank() {
-  LeftFront.setBrake(brakeType::coast);
-  RightFront.setBrake(brakeType::coast);
-  LeftBack.setBrake(brakeType::coast);
-  RightBack.setBrake(brakeType::coast);
-  LeftFront.spin(directionType::fwd, Controller1.Axis3.position()*0.75, percentUnits::pct);
-  LeftBack.spin(directionType::fwd, Controller1.Axis3.position()*0.75, percentUnits::pct);
-  RightFront.spin(directionType::fwd, Controller1.Axis2.position()*0.75, percentUnits::pct);
-  RightBack.spin(directionType::fwd, Controller1.Axis2.position()*0.75, percentUnits::pct);
+  LeftFront.setBrake(brakeType::hold);
+  LeftBack.setBrake(brakeType::hold);
+  RightFront.setBrake(brakeType::hold);
+  RightBack.setBrake(brakeType::hold);
+  LeftFront.spin(directionType::fwd, Controller1.Axis3.position()*0.6, percentUnits::pct);
+  LeftBack.spin(directionType::fwd, Controller1.Axis3.position()*0.6, percentUnits::pct);
+  RightFront.spin(directionType::fwd, Controller1.Axis2.position()*0.6, percentUnits::pct);
+  RightBack.spin(directionType::fwd, Controller1.Axis2.position()*0.6, percentUnits::pct);
 }
 
 void userAcceleration(void){
+  LeftFront.setBrake(brakeType::hold);
+  LeftBack.setBrake(brakeType::hold);
+  RightFront.setBrake(brakeType::hold);
+  RightBack.setBrake(brakeType::hold);
   LeftFront.spin(directionType::fwd);
   RightFront.spin(directionType::fwd);
   int velocities[2] = {0,0};
 
-  motors[0][0]=controller1.Axis3.position(); // left
-  motors[1][0]=controller1.Axis2.position(); // right
+  motors[0][0]=Controller1.Axis3.position(); // left
+  motors[1][0]=Controller1.Axis2.position(); // right
   
   for(int m=0; m<2; m++){
     int mymot = motors[m][mmax-1];
@@ -213,7 +241,7 @@ void arm() {
     Controller1.Screen.clearScreen();
     Controller1.Screen.print("Automatic Mode");
     if(Controller1.ButtonUp.pressing()) {
-      ramp.rotateTo(1210,rotationUnits::deg,false); //perpendicular position(stacking)
+      ramp.rotateTo(1300,rotationUnits::deg,false); //perpendicular position(stacking)
     } else if(Controller1.ButtonDown.pressing()) {
       ramp.rotateTo(10,rotationUnits::deg,false); //declined position(intake / rest)
     } else {
@@ -221,10 +249,10 @@ void arm() {
       //Functions similarly to the one in manual control
       if(armLift.rotation(rotationUnits::deg) > 30) {
         countr = 1;
-        ramp.spinTo(500,rotationUnits::deg,false);
+        ramp.spinTo(500,rotationUnits::deg,70,velocityUnits::pct,false);
       } else if(armLift.rotation(rotationUnits::deg) < 30 && countr == 1) {
         //"false" tag for this function now available, simplifying the issue a lot 
-        ramp.rotateTo(10,rotationUnits::deg,false); 
+        ramp.rotateTo(10,rotationUnits::deg,70,velocityUnits::pct,false); 
         countr = 0;
       }
       //notice the lack of .stop() methods
@@ -238,7 +266,7 @@ void arm() {
       armLift.rotateTo(10,rotationUnits::deg,false); //rest
     }
   }
-  printAngle(armLift);
+  printAngle(ramp);
 
   if(Controller1.ButtonL1.pressing()) { //makes the rollers intake blocks
     armLeft.setVelocity(100,percentUnits::pct);
@@ -265,15 +293,15 @@ void arm() {
 #pragma region auton
 void skillsixteen() {
   //------------Expansion----------------
-  armLeft.setVelocity(100,percentUnits::pct);
-  armRight.setVelocity(100,percentUnits::pct);
-  armLeft.spin(directionType::rev);
-  armRight.spin(directionType::rev);
-  task::sleep(500);
-  armLeft.spin(directionType::fwd);
-  armRight.spin(directionType::fwd);
-  forwardTime(300,-40);
-  task::sleep(150);
+  // armLeft.setVelocity(100,percentUnits::pct);
+  // armRight.setVelocity(100,percentUnits::pct);
+  // armLeft.spin(directionType::rev);
+  // armRight.spin(directionType::rev);
+  // task::sleep(500);
+  // armLeft.spin(directionType::fwd);
+  // armRight.spin(directionType::fwd);
+  // forwardTime(300,-40);
+  // task::sleep(150);
   //-------------Intake------------------
   armLeft.setVelocity(100,percentUnits::pct);
   armRight.setVelocity(100,percentUnits::pct);
@@ -287,7 +315,7 @@ void skillsixteen() {
   task::sleep(500);
   forwardDistance(-72,20);
   task::sleep(500);
-  turn(1,147,20);
+  turn(1,150,20);
   task::sleep(500);
 
 
@@ -323,7 +351,7 @@ void skillsixteen() {
   armLeft.spin(directionType::fwd);
   armRight.spin(directionType::fwd);
   ramp.setVelocity(30,percentUnits::pct);
-  ramp.rotateTo(1100,rotationUnits::deg);
+  ramp.rotateTo(1070,rotationUnits::deg);
   task::sleep(500);
   forwardTime(800,10);
   task::sleep(500);
@@ -441,103 +469,94 @@ void bluEight() {
   armRight.stop();
 }
 void blueBoi() {
+  LeftFront.setBrake(brakeType::brake);
+  LeftBack.setBrake(brakeType::brake);
+  RightFront.setBrake(brakeType::brake);
+  RightBack.setBrake(brakeType::brake);
   //----------------Expansion--------------------
+  // armLeft.setVelocity(100,percentUnits::pct);
+  // armRight.setVelocity(100,percentUnits::pct);
+  // armLeft.spin(directionType::rev);
+  // armRight.spin(directionType::rev);
+  // task::sleep(200);
+  // armLeft.spin(directionType::fwd);
+  // armRight.spin(directionType::fwd);
+  // forwardTime(100,-40);
+  // task::sleep(300);
+  //----------------------------------------------
   armLeft.setVelocity(100,percentUnits::pct);
   armRight.setVelocity(100,percentUnits::pct);
   armLeft.spin(directionType::fwd);
   armRight.spin(directionType::fwd);
-  // wait(200,timeUnits::msec);
-  // armLeft.spin(directionType::rev);
-  // armRight.spin(directionType::rev);
-  // forwardTime(100,-20);
-
-  // armLift.setBrake(brakeType::hold);
-  // armLift.setVelocity(100,percentUnits::pct);
-  // ramp.setVelocity(100,percentUnits::pct);
-  // armLeft.setVelocity(100,percentUnits::pct);
-  // armRight.setVelocity(100,percentUnits::pct);
-
-  // ramp.spinTo(700,rotationUnits::deg);
-  // wait(200,timeUnits::msec);
-  // armLift.spinTo(1000,rotationUnits::deg);
-  // wait(200,timeUnits::msec);
-  // armLift.spinTo(15,rotationUnits::deg);
-  // ramp.spinTo(10,rotationUnits::deg);
-  // armLeft.spin(directionType::rev);
-  // armRight.spin(directionType::rev);
-  // wait(200,timeUnits::msec);
-  // armLeft.stop();
-  // armRight.stop();
-  //----------------------------------------------
-
   //-----------------Intake-----------------------
   //forwardDistance(87,30);
-  accelerate(0,40,30);
-  forwardDistance(47,40);
-  LeftFront.stop();
-  LeftBack.stop();
-  RightFront.stop();
-  RightBack.stop();
-  wait(200,timeUnits::msec);
-  // forwardDistance(87,45);
-  // vex::task::sleep(200);
+  // accelerate(0,50,45);
+  accelerate(30,50,45);
+  // forwardDistance(45,45);
+  decelerate(50,30,52);
+  stopp();
+  wait(150,timeUnits::msec);
   double left = -60;
   double right = -20;
   while(true) {
-    LeftFront.setVelocity(left,vex::percentUnits::pct);
-    LeftBack.setVelocity(left,vex::percentUnits::pct);
-    RightFront.setVelocity(right,vex::percentUnits::pct);
-    RightBack.setVelocity(right,vex::percentUnits::pct);
+    velocitySet(left,right);
     LeftFront.spin(vex::directionType::fwd);
     LeftBack.spin(vex::directionType::fwd);
     RightFront.spin(vex::directionType::fwd);
     RightBack.spin(vex::directionType::fwd);
-    vex::task::sleep(10);
+    wait(10.97,timeUnits::msec);
     left += 0.15;
     right -= 0.15;
-    if(left > 0) {
+    if(left > -21) {
       break;
     }
   }
-  LeftFront.stop();
-  LeftBack.stop();
-  RightFront.stop();
-  RightBack.stop();
+  stopp();
+  wait(500,timeUnits::msec);
+  // forwardDistance(87,30);
+  // accelerate(0,50,30);
+  // forwardDistance(30,45);
+  accelerate(30,50,30);
+  decelerate(50,30,67);
+  // forwardDistance(60,40);
+  wait(100,timeUnits::msec);
+  turn(1,380,30);
+  wait(100,timeUnits::msec);
 
-  forwardDistance(87,30);
+  // forwardTime(1500,70);
+  decelerate(60,35,90);
+  // armLeft.rotateFor(-180,rotationUnits::deg,false);
+  // armRight.rotateFor(-180,rotationUnits::deg,false);
+  forwardTime(900,30);
   wait(200,timeUnits::msec);
-  turn(1,375,30);
-  wait(200,timeUnits::msec);
-  
-  forwardTime(1100,70);
-  wait(200,timeUnits::msec);
-
-  // armLeft.setBrake(brakeType::coast);
-  // armRight.setBrake(brakeType::coast);
-  // armLeft.setVelocity(-8,percentUnits::pct);
-  // armRight.setVelocity(-8,percentUnits::pct);
+  forwardTime(200,-10);
+  armLeft.setBrake(brakeType::coast);
+  armRight.setBrake(brakeType::coast);
+  armLeft.setVelocity(-30,percentUnits::pct);
+  armRight.setVelocity(-30,percentUnits::pct);
   // armLeft.spin(directionType::fwd);
   // armRight.spin(directionType::fwd);
+  armLeft.stop();
+  armRight.stop();
 
-  // ramp.setVelocity(50,percentUnits::pct);
-  // ramp.rotateTo(800,rotationUnits::deg);
-  // ramp.setVelocity(27,percentUnits::pct);
-  // ramp.rotateTo(1210,rotationUnits::deg);
-  // armLeft.stop();
-  // armRight.stop();
-  // wait(100,timeUnits::msec);
-  
-  // armLeft.setVelocity(-20,percentUnits::pct);
-  // armRight.setVelocity(-20,percentUnits::pct);
-  // armLeft.spin(directionType::fwd);
-  // armRight.spin(directionType::fwd);
-  // ramp.setVelocity(100,percentUnits::pct);
-  // ramp.rotateTo(400,rotationUnits::deg,false);
-  // forwardDistance(-30,60);
-  // armLeft.stop();
-  // armRight.stop();
-
-
+  LeftFront.spinFor(toDeg(-3),rotationUnits::deg,10,velocityUnits::pct,false);
+  LeftBack.spinFor(toDeg(-3),rotationUnits::deg,10,velocityUnits::pct,false);
+  RightFront.spinFor(toDeg(3),rotationUnits::deg,10,velocityUnits::pct,false);
+  RightBack.spinFor(toDeg(-3),rotationUnits::deg,10,velocityUnits::pct,false);
+  ramp.setVelocity(38,percentUnits::pct);
+  ramp.rotateTo(1250,rotationUnits::deg);
+  armLeft.stop();
+  armRight.stop();
+  wait(200,timeUnits::msec);
+  armLeft.setVelocity(-100,percentUnits::pct);
+  armRight.setVelocity(-100,percentUnits::pct);
+  armLeft.rotateFor(800,rotationUnits::deg,false);
+  armRight.rotateFor(800,rotationUnits::deg,false);
+  ramp.setVelocity(100,percentUnits::pct);
+  ramp.rotateTo(20,rotationUnits::deg,false);
+  forwardDistance(-30,40);
+  armLeft.stop();
+  armRight.stop();
 
 }
 void redEight(){
@@ -736,20 +755,20 @@ void autonomous(void) {
 /*---------------------------------------------------------------------------*/
 
 void usercontrol(void) {
-  Controller1.ButtonY.pressed(controlMode);
-  Controller1.ButtonRight.pressed(intakeMode);
-  while (1) {
-    arm();
-    //tank();
-    userAcceleration();
-    // wait(20, msec); // Sleep the task for a short amount of time to
-                    // prevent wasted resources.
-  }
-//   auto start = high_resolution_clock::now();
-//   blueBoi();
-//   auto stopp = high_resolution_clock::now();
-//   auto duration = duration_cast<milliseconds>(stopp - start);
-//   std::cout << "Time taken by function: " << duration.count() << " milliseconds" << std::endl;
+  // Controller1.ButtonY.pressed(controlMode);
+  // Controller1.ButtonRight.pressed(intakeMode);
+  // while (1) {
+  //   arm();
+  //   tank();
+  //   // userAcceleration();
+  //   // wait(20, msec); // Sleep the task for a short amount of time to
+  //                   // prevent wasted resources.
+  // }
+  auto start = high_resolution_clock::now();
+  blueBoi();
+  auto stopp = high_resolution_clock::now();
+  auto duration = duration_cast<milliseconds>(stopp - start);
+  std::cout << "Time taken by function: " << duration.count() << " milliseconds" << std::endl;
 }
 
 //
