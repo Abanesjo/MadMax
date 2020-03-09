@@ -169,14 +169,21 @@ void decelerate(double u_percent,double v_percent, double x_cm) {
 
 #pragma region actions
 void tank() {
-  LeftFront.setBrake(brakeType::hold);
-  LeftBack.setBrake(brakeType::hold);
-  RightFront.setBrake(brakeType::hold);
-  RightBack.setBrake(brakeType::hold);
+  // LeftFront.setBrake(brakeType::hold);
+  // LeftBack.setBrake(brakeType::hold);
+  // RightFront.setBrake(brakeType::hold);
+  // RightBack.setBrake(brakeType::hold);
+  if(manual) {
+  LeftFront.spin(directionType::fwd, Controller1.Axis3.position(), percentUnits::pct);
+  LeftBack.spin(directionType::fwd, Controller1.Axis3.position(), percentUnits::pct);
+  RightFront.spin(directionType::fwd, Controller1.Axis2.position(), percentUnits::pct);
+  RightBack.spin(directionType::fwd, Controller1.Axis2.position(), percentUnits::pct);
+  } else {
   LeftFront.spin(directionType::fwd, Controller1.Axis3.position()*0.6, percentUnits::pct);
   LeftBack.spin(directionType::fwd, Controller1.Axis3.position()*0.6, percentUnits::pct);
   RightFront.spin(directionType::fwd, Controller1.Axis2.position()*0.6, percentUnits::pct);
   RightBack.spin(directionType::fwd, Controller1.Axis2.position()*0.6, percentUnits::pct);
+  }
 }
 
 void userAcceleration(void){
@@ -207,7 +214,7 @@ void userAcceleration(void){
   LeftBack.spin(vex::directionType::fwd);
   RightBack.spin(vex::directionType::fwd);
 
-  vex::task::sleep(5);
+  vex::task::sleep(1);
 }
 
 void arm() {
@@ -220,9 +227,9 @@ void arm() {
    Controller1.Screen.clearScreen();
    Controller1.Screen.print("Manual Mode");
    if(Controller1.ButtonUp.pressing()) {
-     ramp.spin(directionType::fwd,rampVelocity,percentUnits::pct);
+     ramp.spin(directionType::fwd,20,percentUnits::pct);
    } else if(Controller1.ButtonDown.pressing()) {
-     ramp.spin(directionType::rev,rampVelocity,percentUnits::pct);
+     ramp.spin(directionType::rev,20,percentUnits::pct);
    } else {
      ramp.stop();
    }
@@ -241,7 +248,7 @@ void arm() {
     Controller1.Screen.clearScreen();
     Controller1.Screen.print("Automatic Mode");
     if(Controller1.ButtonUp.pressing()) {
-      ramp.rotateTo(1300,rotationUnits::deg,false); //perpendicular position(stacking)
+      ramp.rotateTo(1280,rotationUnits::deg,false); //perpendicular position(stacking)
     } else if(Controller1.ButtonDown.pressing()) {
       ramp.rotateTo(10,rotationUnits::deg,false); //declined position(intake / rest)
     } else {
@@ -303,76 +310,76 @@ void skillsixteen() {
   // forwardTime(300,-40);
   // task::sleep(150);
   //-------------Intake------------------
-  armLeft.setVelocity(100,percentUnits::pct);
-  armRight.setVelocity(100,percentUnits::pct);
-  armLeft.spin(directionType::fwd);//
-  armRight.spin(directionType::fwd);
-  forwardDistance(75,15);
-  task::sleep(500);
-  forwardDistance(-10,20);
-  task::sleep(500);
-  turn(0,147,20);
-  task::sleep(500);
-  forwardDistance(-72,20);
-  task::sleep(500);
-  turn(1,150,20);
-  task::sleep(500);
+  // armLeft.setVelocity(100,percentUnits::pct);
+  // armRight.setVelocity(100,percentUnits::pct);
+  // armLeft.spin(directionType::fwd);//
+  // armRight.spin(directionType::fwd);
+  // forwardDistance(75,15);
+  // task::sleep(500);
+  // forwardDistance(-10,20);
+  // task::sleep(500);
+  // turn(0,147,20);
+  // task::sleep(500);
+  // forwardDistance(-72,20);
+  // task::sleep(500);
+  // turn(1,150,20);
+  // task::sleep(500);
 
 
-  forwardDistance(78,15);
-  armLeft.setBrake(hold);
-  armRight.setBrake(hold);
-  armLeft.stop();
-  armRight.stop();
-  task::sleep(500);
-  forwardDistance(-38,15);
+  // forwardDistance(78,15);
+  // armLeft.setBrake(hold);
+  // armRight.setBrake(hold);
+  // armLeft.stop();
+  // armRight.stop();
+  // task::sleep(500);
+  // forwardDistance(-38,15);
 
-  turn(1,380,20); //389
-  task::sleep(500);
+  // turn(1,378,20); //389
+  // task::sleep(500);
 
-  //--------------Stacking----------------
-  forwardTime(2500,50);
-  task::sleep(500);
+  // //--------------Stacking----------------
+  // forwardTime(2500,50);
+  // task::sleep(500);
 
-  forwardTime(500,-10);
+  // forwardTime(500,-10);
 
-  armLeft.setVelocity(25,percentUnits::pct);
-  armRight.setVelocity(25,percentUnits::pct);
-  armLeft.rotateFor(-75,rotationUnits::deg,false);
-  armRight.rotateFor(-75,rotationUnits::deg);
+  // armLeft.setVelocity(25,percentUnits::pct);
+  // armRight.setVelocity(25,percentUnits::pct);
+  // armLeft.rotateFor(-75,rotationUnits::deg,false);
+  // armRight.rotateFor(-75,rotationUnits::deg);
 
-  armLeft.stop();
-  armRight.stop();
+  // armLeft.stop();
+  // armRight.stop();
 
-  task::sleep(500);
+  // task::sleep(500);
 
-  armLeft.setVelocity(20,percentUnits::pct);
-  armRight.setVelocity(20,percentUnits::pct);
-  armLeft.spin(directionType::fwd);
-  armRight.spin(directionType::fwd);
-  ramp.setVelocity(30,percentUnits::pct);
-  ramp.rotateTo(1070,rotationUnits::deg);
-  task::sleep(500);
-  forwardTime(800,10);
-  task::sleep(500);
-  armLeft.setVelocity(-15,percentUnits::pct);
-  armRight.setVelocity(-15,percentUnits::pct);
-  armLeft.rotateFor(-800,rotationUnits::deg,false);
-  armRight.rotateFor(-800,rotationUnits::deg,false);
-  forwardDistance(-30,30); // 25
+  // armLeft.setVelocity(20,percentUnits::pct);
+  // armRight.setVelocity(20,percentUnits::pct);
+  // armLeft.spin(directionType::fwd);
+  // armRight.spin(directionType::fwd);
+  // ramp.setVelocity(30,percentUnits::pct);
+  // ramp.rotateTo(1250,rotationUnits::deg);
+  // task::sleep(500);
+  // forwardTime(800,10);
+  // task::sleep(500);
+  // armLeft.setVelocity(-15,percentUnits::pct);
+  // armRight.setVelocity(-15,percentUnits::pct);
+  // armLeft.rotateFor(-800,rotationUnits::deg,false);
+  // armRight.rotateFor(-800,rotationUnits::deg,false);
+  forwardDistance(-40,30); // 25
   armLeft.stop();
   armRight.stop();
 
   //------------Scoring-------------
    task::sleep(500);
-  turn(1,430,15); //maybe 405
+  turn(1,400,15); //maybe 405
   LeftFront.setVelocity(30,percentUnits::pct);
   LeftBack.setVelocity(30,percentUnits::pct);
   RightFront.setVelocity(30,percentUnits::pct);
   RightBack.setVelocity(30,percentUnits::pct);
   task::sleep(500);
   ramp.rotateTo(400,rotationUnits::deg,false);
-  forwardTime(2500,-50);
+  forwardTime(2500,-50); 
   task::sleep(500);
   //----------------------------------------
   forwardDistance(100,25);
@@ -412,7 +419,7 @@ void bluEight() {
   armLeft.spin(directionType::fwd);
   armRight.spin(directionType::fwd);
   forwardTime(100,-40);
-  // task::sleep(100);
+  task::sleep(100);
 
   //end of expansion
   //----------------intake--------------
@@ -474,15 +481,15 @@ void blueBoi() {
   RightFront.setBrake(brakeType::brake);
   RightBack.setBrake(brakeType::brake);
   //----------------Expansion--------------------
-  // armLeft.setVelocity(100,percentUnits::pct);
-  // armRight.setVelocity(100,percentUnits::pct);
-  // armLeft.spin(directionType::rev);
-  // armRight.spin(directionType::rev);
-  // task::sleep(200);
-  // armLeft.spin(directionType::fwd);
-  // armRight.spin(directionType::fwd);
-  // forwardTime(100,-40);
-  // task::sleep(300);
+  armLeft.setVelocity(100,percentUnits::pct);
+  armRight.setVelocity(100,percentUnits::pct);
+  armLeft.spin(directionType::rev);
+  armRight.spin(directionType::rev);
+  task::sleep(200);
+  armLeft.spin(directionType::fwd);
+  armRight.spin(directionType::fwd);
+  forwardTime(200,-60);
+  task::sleep(150);
   //----------------------------------------------
   armLeft.setVelocity(100,percentUnits::pct);
   armRight.setVelocity(100,percentUnits::pct);
@@ -491,11 +498,11 @@ void blueBoi() {
   //-----------------Intake-----------------------
   //forwardDistance(87,30);
   // accelerate(0,50,45);
-  accelerate(30,50,45);
+  accelerate(40,50,45);
   // forwardDistance(45,45);
   decelerate(50,30,52);
   stopp();
-  wait(150,timeUnits::msec);
+  wait(100,timeUnits::msec);
   double left = -60;
   double right = -20;
   while(true) {
@@ -507,44 +514,53 @@ void blueBoi() {
     wait(10.97,timeUnits::msec);
     left += 0.15;
     right -= 0.15;
-    if(left > -21) {
+    if(left > -20.5) {
       break;
     }
   }
   stopp();
-  wait(500,timeUnits::msec);
+  wait(150,timeUnits::msec);
   // forwardDistance(87,30);
   // accelerate(0,50,30);
   // forwardDistance(30,45);
-  accelerate(30,50,30);
-  decelerate(50,30,67);
+  accelerate(40,50,40);
+  decelerate(50,35,65);
   // forwardDistance(60,40);
   wait(100,timeUnits::msec);
-  turn(1,380,30);
-  wait(100,timeUnits::msec);
+  turn(1,385,35);
+  wait(150,timeUnits::msec);
 
   // forwardTime(1500,70);
-  decelerate(60,35,90);
+  //forwardDistance(60,90);
+  decelerate(70,69,90);
   // armLeft.rotateFor(-180,rotationUnits::deg,false);
   // armRight.rotateFor(-180,rotationUnits::deg,false);
-  forwardTime(900,30);
-  wait(200,timeUnits::msec);
-  forwardTime(200,-10);
   armLeft.setBrake(brakeType::coast);
   armRight.setBrake(brakeType::coast);
+  armLeft.stop();
+  armRight.stop();
   armLeft.setVelocity(-30,percentUnits::pct);
   armRight.setVelocity(-30,percentUnits::pct);
+  armLeft.rotateFor(-120,rotationUnits::deg,false);
+  armRight.rotateFor(-120,rotationUnits::deg,false);
+  ramp.setVelocity(35,percentUnits::pct);
+  ramp.rotateTo(1240,rotationUnits::deg,false);
+  forwardTime(650,40);
+  ramp.setVelocity(30,percentUnits::pct);
+  ramp.spin(directionType::fwd);
+  // ramp.rotateTo(1240,rotationUnits::deg,false);
+  // wait(150,timeUnits::msec);
+  // forwardTime(150,-30);
   // armLeft.spin(directionType::fwd);
   // armRight.spin(directionType::fwd);
   armLeft.stop();
   armRight.stop();
-
-  LeftFront.spinFor(toDeg(-3),rotationUnits::deg,10,velocityUnits::pct,false);
-  LeftBack.spinFor(toDeg(-3),rotationUnits::deg,10,velocityUnits::pct,false);
-  RightFront.spinFor(toDeg(3),rotationUnits::deg,10,velocityUnits::pct,false);
-  RightBack.spinFor(toDeg(-3),rotationUnits::deg,10,velocityUnits::pct,false);
-  ramp.setVelocity(38,percentUnits::pct);
-  ramp.rotateTo(1250,rotationUnits::deg);
+  LeftFront.spinFor(toDeg(-3.5),rotationUnits::deg,15,velocityUnits::pct,false);
+  LeftBack.spinFor(toDeg(-3.5),rotationUnits::deg,15,velocityUnits::pct,false);
+  RightFront.spinFor(toDeg(-3.5),rotationUnits::deg,15,velocityUnits::pct,false);
+  RightBack.spinFor(toDeg(-3.5),rotationUnits::deg,15,velocityUnits::pct,false);
+  // ramp.setVelocity(35,percentUnits::pct);
+  ramp.rotateTo(1240,rotationUnits::deg);
   armLeft.stop();
   armRight.stop();
   wait(200,timeUnits::msec);
@@ -648,15 +664,15 @@ void bluFive() {
   //implemented as here the robot doesn’t start from a base.
   
   //-------------Expansion-------------
-  // armLeft.setVelocity(100,percentUnits::pct);
-  // armRight.setVelocity(100,percentUnits::pct);
-  // armLeft.spin(directionType::rev);
-  // armRight.spin(directionType::rev);
-  // task::sleep(350);
-  // armLeft.spin(directionType::fwd);
-  // armRight.spin(directionType::fwd);
-  // forwardTime(350,-40);
-  // task::sleep(150);
+  armLeft.setVelocity(100,percentUnits::pct);
+  armRight.setVelocity(100,percentUnits::pct);
+  armLeft.spin(directionType::rev);
+  armRight.spin(directionType::rev);
+  task::sleep(350);
+  armLeft.spin(directionType::fwd);
+  armRight.spin(directionType::fwd);
+  forwardTime(350,-40);
+  task::sleep(150);
   //--------End of Expansion------------
 
   armLeft.setVelocity(100,percentUnits::pct);
@@ -672,12 +688,19 @@ void bluFive() {
   task::sleep(300);
   turn(1,410,20); //389
   task::sleep(300);
-
-  forwardTime(1000,60);
+  armLeft.setVelocity(-30,percentUnits::pct);
+  armRight.setVelocity(-30,percentUnits::pct);
+  armLeft.rotateFor(-120,rotationUnits::deg,false);
+  armRight.rotateFor(-120,rotationUnits::deg,false);
+  forwardTime(1500,60);
   task::sleep(200);
   //forwardTime(550,-10);
+  LeftFront.spinFor(toDeg(-3.5),rotationUnits::deg,15,velocityUnits::pct,false);
+  LeftBack.spinFor(toDeg(-3.5),rotationUnits::deg,15,velocityUnits::pct,false);
+  RightFront.spinFor(toDeg(-3.5),rotationUnits::deg,15,velocityUnits::pct,false);
+  RightBack.spinFor(toDeg(-3.5),rotationUnits::deg,15,velocityUnits::pct,false);
 
-  ramp.setVelocity(45,percentUnits::pct);
+  ramp.setVelocity(40,percentUnits::pct);
   ramp.rotateTo(1300,rotationUnits::deg);
   task::sleep(300);
   forwardTime(500,15);
@@ -760,20 +783,20 @@ void autonomous(void) {
 /*---------------------------------------------------------------------------*/
 
 void usercontrol(void) {
-  Controller1.ButtonY.pressed(controlMode);
-  Controller1.ButtonRight.pressed(intakeMode);
-  while (1) {
-    arm();
-    tank();
-    //userAcceleration();
-    wait(10, msec); // Sleep the task for a short amount of time to
-                    // prevent wasted resources.
-  }
-  // auto start = high_resolution_clock::now();
-  // bluFive();
-  // auto stopp = high_resolution_clock::now();
-  // auto duration = duration_cast<milliseconds>(stopp - start);
-  // std::cout << "Time taken by function: " << duration.count() << " milliseconds" << std::endl;
+  // Controller1.ButtonY.pressed(controlMode);
+  // Controller1.ButtonRight.pressed(intakeMode);
+  // while (1) {
+  //   arm();
+  //   tank();
+  //   // userAcceleration();
+  //   // wait(10, msec); // Sleep the task for a short amount of time to
+  //                   // prevent wasted resources.
+  // }
+  auto start = high_resolution_clock::now();
+  skillsixteen();
+  auto stopp = high_resolution_clock::now();
+  auto duration = duration_cast<milliseconds>(stopp - start);
+  std::cout << "Time taken by function: " << duration.count() << " milliseconds" << std::endl;
 }
 
 //
